@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Akses Template Canva | Studio Bliss</title>
+<meta name="description" content="Akses desain Canva template dari Studio Bliss. Bayar via QRIS, link dikirim lewat WhatsApp.">
+<meta property="og:title" content="Akses Template Canva | Studio Bliss">
+<meta property="og:image" content="fishy-garden.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chewy&family=Baloo+2:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sky:#8fcdf7; --sky-deep:#3f93d6; --grass:#58ad45; --cherry:#d7263d;
+  --goldfish:#ff8a1f; --paper:#fffdf7; --ink:#1d2a3a; --muted:#5b6b7d;
+  --head:"Chewy","Comic Sans MS",cursive; --body:"Baloo 2",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:var(--body);color:var(--ink);line-height:1.55;
+  background:linear-gradient(var(--sky) 0 38%,var(--grass) 38% 100%) fixed;
+  padding:24px 16px 48px}
+.wrap{max-width:520px;margin:0 auto}
+.card{background:var(--paper);border:3px solid var(--ink);border-radius:22px;
+  box-shadow:6px 6px 0 var(--ink);padding:20px;margin-bottom:22px}
+.brand{font-family:var(--head);font-size:1.15rem;text-align:center;margin:0 0 14px;color:var(--ink)}
+.hero{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:14px;border:3px solid var(--ink);display:block;background:#dfeefa}
+h1{font-family:var(--head);font-weight:400;font-size:1.65rem;line-height:1.2;margin:18px 0 6px;color:var(--cherry)}
+.price{font-family:var(--head);font-size:1.6rem;margin:0 0 4px}
+.sub{color:var(--muted);margin:0 0 14px;font-size:.95rem}
+h2{font-family:var(--head);font-weight:400;font-size:1.25rem;margin:18px 0 8px}
+ul.benefit{list-style:none;padding:0;margin:0}
+ul.benefit li{padding-left:28px;position:relative;margin:7px 0}
+ul.benefit li::before{content:"";position:absolute;left:2px;top:.5em;width:14px;height:14px;
+  background:var(--cherry);border-radius:50%;box-shadow:inset -3px -3px 0 rgba(0,0,0,.18)}
+.btn{display:block;width:100%;text-align:center;text-decoration:none;cursor:pointer;
+  font:700 1.1rem var(--body);color:#fff;background:var(--cherry);
+  border:3px solid var(--ink);border-radius:999px;padding:12px 18px;margin-top:20px;
+  box-shadow:0 5px 0 var(--ink);transition:transform .08s,box-shadow .08s}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink)}
+.btn.wa{background:var(--grass)}
+.btn:focus-visible,a:focus-visible{outline:4px solid var(--goldfish);outline-offset:3px}
+#bayar[hidden]{display:none}
+#bayar{animation:buka .35s ease-out}
+@keyframes buka{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+.qris{width:100%;max-width:320px;display:block;margin:12px auto;border:3px solid var(--ink);border-radius:14px;background:#fff}
+.nominal{text-align:center;background:#fff3d6;border:3px dashed var(--goldfish);border-radius:14px;padding:10px;margin:12px 0}
+.nominal strong{display:block;font-family:var(--head);font-size:1.9rem;font-weight:400}
+.nominal span{font-size:.9rem;color:var(--muted)}
+ol.langkah{padding-left:20px;margin:8px 0}
+ol.langkah li{margin:6px 0}
+.note{font-size:.88rem;color:var(--muted);text-align:center;margin:16px 0 0}
+.err{text-align:center}
+@media (prefers-reduced-motion:reduce){#bayar{animation:none}html{scroll-behavior:auto}.btn{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+/* ============ UBAH BAGIAN INI SAJA ============ */
+const CONFIG = {
+  wa: "628XXXXXXXXXX",      // nomor WhatsApp kamu, awali 62 tanpa tanda + atau 0
+  kodeUnik: true,            // tambah 1–99 rupiah di nominal supaya gampang dicocokkan dengan mutasi
+  qris: "qris.png"           // file gambar QRIS kamu, taruh sefolder dengan index.html
+};
+
+const PRODUK = {
+  "fishy-garden": {
+    nama: "Fishy Garden",
+    judul: "Access Y2K Scrapbook Design – Fishy Garden for Canva Link / Canva Template",
+    harga: 25000,
+    gambar: "fishy-garden.jpg",    // taruh sefolder dengan index.html
+    benefit: [
+      "Dapat link Canva yang bisa langsung kamu edit sendiri",
+      "Elemen desain bisa dipakai ulang untuk karyamu",
+      "Cukup satu kali bayar, tanpa langganan",
+      "Link dikirim lewat WhatsApp setelah pembayaran dicek"
+    ]
+  }
+  // Tambah produk lain dengan menyalin blok di atas, lalu ganti kunci "fishy-garden"
+  // Contoh link Pinterest: https://namatokomu.netlify.app/?p=fishy-garden
+};
+/* ============================================== */
+
+const rupiah = n => "Rp" + n.toLocaleString("id-ID");
+const app = document.getElementById("app");
+const slug = new URLSearchParams(location.search).get("p") || Object.keys(PRODUK)[0];
+const p = PRODUK[slug];
+
+function kodeUnikFor(slug){
+  if(!CONFIG.kodeUnik) return 0;
+  const key = "kode-" + slug;
+  try{
+    const saved = sessionStorage.getItem(key);
+    if(saved) return Number(saved);
+  }catch(e){}
+  const k = 1 + Math.floor(Math.random()*99);
+  try{ sessionStorage.setItem(key, k); }catch(e){}
+  return k;
+}
+
+function el(tag, attrs, children){
+  const n = document.createElement(tag);
+  Object.entries(attrs||{}).forEach(([k,v]) => k==="text" ? n.textContent=v : n.setAttribute(k,v));
+  (children||[]).forEach(c => n.appendChild(c));
+  return n;
+}
+
+if(!p){
+  app.appendChild(el("div",{class:"card err"},[
+    el("h1",{text:"Desain tidak ditemukan"}),
+    el("p",{text:"Link ini mungkin salah. Kembali ke Pinterest dan klik ulang tombol Buka situs."})
+  ]));
+}else{
+  document.title = "Akses " + p.nama + " Canva Template | Studio Bliss";
+  const kode = kodeUnikFor(slug);
+  const total = p.harga + kode;
+
+  const hero = el("img",{class:"hero",src:p.gambar,alt:"Preview desain " + p.nama});
+  const produk = el("section",{class:"card"},[
+    el("p",{class:"brand",text:"Studio Bliss"}),
+    hero,
+    el("h1",{text:p.judul}),
+    el("p",{class:"price",text:rupiah(p.harga)}),
+    el("p",{class:"sub",text:"Sekali bayar, akses Canva template."}),
+    el("h2",{text:"Yang kamu dapat"}),
+    (()=>{const ul=el("ul",{class:"benefit"}); p.benefit.forEach(b=>ul.appendChild(el("li",{text:b}))); return ul;})(),
+    el("button",{class:"btn",id:"btnAkses",type:"button","aria-expanded":"false","aria-controls":"bayar",text:"Dapatkan link Canva"})
+  ]);
+
+  const pesan = `Halo, saya sudah payment untuk ${p.nama} (${rupiah(total)}). Ini bukti pembayarannya.`;
+  const waUrl = `https://wa.me/${CONFIG.wa}?text=${encodeURIComponent(pesan)}`;
+
+  const bayar = el("section",{class:"card",id:"bayar",hidden:""},[
+    el("h2",{text:"Bayar dengan QRIS"}),
+    el("div",{class:"nominal"},[
+      el("span",{text:"Nominal yang harus dibayar"}),
+      el("strong",{text:rupiah(total)}),
+      el("span",{text: CONFIG.kodeUnik ? `Sudah termasuk kode unik ${kode}. Bayar tepat sesuai nominal ini.` : "Bayar tepat sesuai nominal ini."})
+    ]),
+    el("img",{class:"qris",src:CONFIG.qris,alt:"Kode QRIS Studio Bliss"}),
+    el("ol",{class:"langkah"},[
+      el("li",{text:"Scan QRIS dengan aplikasi bank atau e-wallet."}),
+      el("li",{text:"Ketik nominal persis seperti di atas, lalu bayar."}),
+      el("li",{text:"Screenshot bukti pembayaran."}),
+      el("li",{text:"Klik tombol di bawah, lalu kirim screenshot di chat WhatsApp."})
+    ]),
+    (()=>{const a=el("a",{class:"btn wa",href:waUrl,target:"_blank",rel:"noopener",text:"Konfirmasi payment"}); return a;})(),
+    el("p",{class:"note",text:"Link Canva dikirim setelah pembayaranmu dicek, biasanya dalam beberapa menit di jam aktif."})
+  ]);
+
+  app.appendChild(produk);
+  app.appendChild(bayar);
+
+  const btn = document.getElementById("btnAkses");
+  btn.addEventListener("click",()=>{
+    bayar.hidden = false;
+    btn.setAttribute("aria-expanded","true");
+    bayar.scrollIntoView({behavior:"smooth",block:"start"});
+  });
+}
+</script>
+</body>
+</html>
